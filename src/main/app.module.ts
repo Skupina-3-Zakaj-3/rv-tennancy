@@ -5,7 +5,6 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Reservation } from 'src/reservation/entities/reservation.entity';
 import { ReservationModule } from 'src/reservation/reservation.module';
-import config from 'src/config/config';
 
 @Module({
   imports: [

@@ -16,7 +16,7 @@ spec:
         - image: anzeha/rv-tenancy
           name: rv-tenancy
           env:
-            - name: datasources.connection-url
+            - name: datasources_connection_url
               valueFrom:
                 secretKeyRef:
                   name: pg-pass
