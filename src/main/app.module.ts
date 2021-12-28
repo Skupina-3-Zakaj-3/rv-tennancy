@@ -1,12 +1,35 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppService } from './app.service';
 import config from 'src/config/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Reservation } from 'src/reservation/entities/reservation.entity';
+import { ReservationModule } from 'src/reservation/reservation.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true, load: [config] })],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true, load: [config] }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'postgres',
+        url: configService.get<string>('datasources.connection-url'),
+        synchronize: true,
+        logging: false,
+        entities: [Reservation],
+      }),
+    }),
+    ReservationModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  static port: string | number;
+
+  constructor(private readonly config: ConfigService) {
+    AppModule.port = this.config.get<number>('http.port');
+  }
+}
