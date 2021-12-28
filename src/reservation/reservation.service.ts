@@ -12,22 +12,22 @@ export class ReservationService {
     private readonly reservationRepository: Repository<Reservation>,
   ) {}
   create(createReservationDto: CreateReservationDto) {
-    return 'This action adds a new reservation';
+    return this.reservationRepository.save(createReservationDto);
   }
 
   findAll() {
-    return `This action returns all reservation`;
+    return this.reservationRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} reservation`;
+    return this.reservationRepository.findOne(id);
   }
 
-  update(id: number, updateReservationDto: UpdateReservationDto) {
+  /* update(id: number, updateReservationDto: UpdateReservationDto) {
     return `This action updates a #${id} reservation`;
-  }
+  } */
 
   remove(id: number) {
-    return `This action removes a #${id} reservation`;
+    return this.reservationRepository.delete(id);
   }
 }
