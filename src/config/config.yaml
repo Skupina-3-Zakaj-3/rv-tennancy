@@ -1,5 +1,5 @@
 http:
   port: 3000
-  host: 'localhost'
+  host: localhost
 datasources:
   connection-url: postgresql://dbuser:postgres@localhost:5432/rv_tennacy
