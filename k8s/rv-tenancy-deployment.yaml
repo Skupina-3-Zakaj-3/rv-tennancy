@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rv-tenancy-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rv-tenancy
+  template:
+    metadata:
+      labels:
+        app: rv-tenancy
+    spec:
+      containers:
+        - image: anzeha/rv-tenancy
+          name: rv-tenancy
+          env:
+            - name: datasources.connection-url
+              valueFrom:
+                secretKeyRef:
+                  name: pg-pass
+                  key: NESTJS_DATASOURCES0_URL_RV_TENANCY
+          ports:
+            - containerPort: 3000
+              name: server
+              protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rv-tenancy
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8085
+      protocol: TCP
+      targetPort: server
+  selector:
+    app: rv-tenancy
