@@ -2,14 +2,13 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppService } from './app.service';
-import config from 'src/config/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Reservation } from 'src/reservation/entities/reservation.entity';
 import { ReservationModule } from 'src/reservation/reservation.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [config] }),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -30,6 +29,6 @@ export class AppModule {
   static port: string | number;
 
   constructor(private readonly config: ConfigService) {
-    AppModule.port = this.config.get<number>('http.port');
+    AppModule.port = 3000;
   }
 }
