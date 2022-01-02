@@ -15,7 +15,7 @@ import { ReservationService } from './reservation.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 
-@Controller('rv-tenancies')
+@Controller('rvs')
 export class ReservationController {
   constructor(private readonly reservationService: ReservationService) {}
 
