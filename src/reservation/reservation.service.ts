@@ -30,4 +30,8 @@ export class ReservationService {
   remove(id: number) {
     return this.reservationRepository.delete(id);
   }
+
+  findByUserId(userId: number) {
+    return this.reservationRepository.find({ where: { userId: userId } });
+  }
 }

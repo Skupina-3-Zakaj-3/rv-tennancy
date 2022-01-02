@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpException,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { ReservationService } from './reservation.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
@@ -34,10 +35,12 @@ export class ReservationController {
   }
 
   @Get()
-  async findAll() {
+  async findAll(@Query('userId') userId: number) {
     let res;
     try {
-      res = await this.reservationService.findAll();
+      if (userId) {
+        res = await this.reservationService.findByUserId(userId);
+      } else res = await this.reservationService.findAll();
     } catch (error) {
       throw new HttpException(
         'Retrieving reservations unsuccessful',
