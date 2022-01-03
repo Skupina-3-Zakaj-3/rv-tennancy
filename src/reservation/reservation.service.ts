@@ -44,12 +44,28 @@ export class ReservationService {
       this.findByUserId(userId).pipe(
         switchMap((reservations) => {
           const rvIds = reservations.map((reservation) => reservation.rvId);
-          return this.httpService.get(
-            `${this.rvsServiceBasePath}/rvs?filter=rv_id:IN:[${rvIds}]`,
+          return (
+            this.httpService
+              .get(`${this.rvsServiceBasePath}/rvs?filter=rv_id:IN:[${rvIds}]`)
+              //.get(`http://20.72.172.42/rvs/v1/rvs?filter=rv_id:IN:[${rvIds}]`)
+              .pipe(
+                map((rv) => {
+                  return rv.data as any[];
+                }),
+                map((rvs) => {
+                  return rvs.map((rv) => {
+                    const matchingReservation = reservations.find(
+                      (x) => x.rvId == rv.rv_id,
+                    );
+
+                    return {
+                      ...rv,
+                      reservation: matchingReservation,
+                    };
+                  });
+                }),
+              )
           );
-        }),
-        map((res) => {
-          return res.data;
         }),
       ),
     );
