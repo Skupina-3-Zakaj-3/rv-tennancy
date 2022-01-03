@@ -1,5 +1,7 @@
+import { HttpModule, HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { firstValueFrom, from, map, switchMap, tap } from 'rxjs';
 import { Repository } from 'typeorm/repository/Repository';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
@@ -7,9 +9,11 @@ import { Reservation } from './entities/reservation.entity';
 
 @Injectable()
 export class ReservationService {
+  private rvsServiceBasePath = `http://rv-catalog:8082/v1`;
   constructor(
     @InjectRepository(Reservation)
     private readonly reservationRepository: Repository<Reservation>,
+    private httpService: HttpService,
   ) {}
   create(createReservationDto: CreateReservationDto) {
     return this.reservationRepository.save(createReservationDto);
@@ -32,6 +36,22 @@ export class ReservationService {
   }
 
   findByUserId(userId: number) {
-    return this.reservationRepository.find({ where: { userId: userId } });
+    return from(this.reservationRepository.find({ where: { userId: userId } }));
+  }
+
+  findRvsByUserId(userId: number): Promise<any> {
+    return firstValueFrom(
+      this.findByUserId(userId).pipe(
+        switchMap((reservations) => {
+          const rvIds = reservations.map((reservation) => reservation.rvId);
+          return this.httpService.get(
+            `${this.rvsServiceBasePath}/rvs?filter=rv_id:IN:[${rvIds}]`,
+          );
+        }),
+        map((res) => {
+          return res.data;
+        }),
+      ),
+    );
   }
 }

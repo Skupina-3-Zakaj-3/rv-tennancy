@@ -10,12 +10,14 @@ import {
   HttpException,
   HttpStatus,
   Query,
+  HttpService,
 } from '@nestjs/common';
 import { ReservationService } from './reservation.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
+import { catchError, switchMap } from 'rxjs';
 
-@Controller('rvs')
+@Controller('rv-reservations')
 export class ReservationController {
   constructor(private readonly reservationService: ReservationService) {}
 
@@ -35,15 +37,27 @@ export class ReservationController {
   }
 
   @Get()
-  async findAll(@Query('userId') userId: number) {
+  async findAll() {
     let res;
     try {
-      if (userId) {
-        res = await this.reservationService.findByUserId(userId);
-      } else res = await this.reservationService.findAll();
+      res = await this.reservationService.findAll();
     } catch (error) {
       throw new HttpException(
         'Retrieving reservations unsuccessful',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return res;
+  }
+
+  @Get('rvs')
+  async findAllUserRvs(@Query('userId') userId: number) {
+    let res;
+    try {
+      res = await this.reservationService.findRvsByUserId(userId);
+    } catch (error) {
+      throw new HttpException(
+        'Retrieving rv reservations for user unsuccessful',
         HttpStatus.BAD_REQUEST,
       );
     }
